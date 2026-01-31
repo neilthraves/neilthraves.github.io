@@ -23,7 +23,7 @@
     letter-spacing: 1px;
   }
 
-  select, button {
+  select, button, label {
     width: 100%;
     padding: 10px;
     margin: 6px 0;
@@ -32,6 +32,17 @@
     color: #eee;
     border: 1px solid #444;
     border-radius: 6px;
+  }
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+
+  input[type="checkbox"] {
+    transform: scale(1.2);
   }
 
   .box {
@@ -65,7 +76,7 @@
   <option value="62">D</option>
   <option value="64">E</option>
   <option value="65">F</option>
-  <option value="67">G</option>
+  <option value="67" selected>G</option>
   <option value="69">A</option>
   <option value="71">B</option>
 </select>
@@ -75,6 +86,11 @@
   <option value="IV">IV</option>
   <option value="V">V</option>
 </select>
+
+<label>
+  <input type="checkbox" id="oneString" />
+  One String Mode
+</label>
 
 <button id="generate" type="button">Generate</button>
 <button id="playCall" type="button">Play Call</button>
@@ -95,7 +111,6 @@
 document.addEventListener("touchstart", () => {}, { once: true });
 
 let audioCtx = null;
-let lastCall = null;
 
 /* Interval map */
 const intervalMap = {
@@ -109,8 +124,7 @@ const intervalMap = {
   "b7": 10
 };
 
-/* ===== REAL BLUES VOCAB ===== */
-
+/* Blues phrase vocab */
 const CALL_PATTERNS = [
   ["b3", "4", "b3"],
   ["b3", "4", "b3"],
@@ -147,15 +161,11 @@ function randomItem(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
+/* Phrase generation */
 function generatePhrase() {
   const chord = chordSelect.value;
 
-  if (lastCall && Math.random() < 0.5) {
-    callPhrase = lastCall;
-  } else {
-    callPhrase = randomItem(CALL_PATTERNS);
-    lastCall = callPhrase;
-  }
+  callPhrase = randomItem(CALL_PATTERNS);
 
   if (chord === "I") responsePhrase = randomItem(RESPONSE_I);
   if (chord === "IV") responsePhrase = randomItem(RESPONSE_IV);
@@ -165,8 +175,7 @@ function generatePhrase() {
   responseDisplay.textContent = responsePhrase.join(" – ");
 }
 
-/* ===== AUDIO ===== */
-
+/* Audio */
 function ensureAudio() {
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -180,6 +189,7 @@ function playWithDrone(intervals) {
 
   const root = parseInt(rootSelect.value, 10);
   const chord = chordSelect.value;
+  const oneString = oneStringCheckbox.checked;
 
   let base = root;
   if (chord === "IV") base += 5;
@@ -192,19 +202,29 @@ function playWithDrone(intervals) {
   const droneGain = audioCtx.createGain();
   droneOsc.type = "sine";
   droneOsc.frequency.value = 440 * Math.pow(2, (base - 69) / 12);
-  droneGain.gain.value = 0.08;
-
+  droneGain.gain.value = 0.04;
   droneOsc.connect(droneGain).connect(audioCtx.destination);
   droneOsc.start(now);
 
   let time = now;
 
+  /* One-string logic */
+  let currentMidi = base + 12; // start in a realistic guitar register
+
   intervals.forEach(i => {
+    let targetMidi = base + intervalMap[i];
+
+    if (oneString) {
+      while (targetMidi < currentMidi) {
+        targetMidi += 12;
+      }
+      currentMidi = targetMidi;
+    }
+
+    const freq = 440 * Math.pow(2, (targetMidi - 69) / 12);
+
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
-
-    const midi = base + intervalMap[i];
-    const freq = 440 * Math.pow(2, (midi - 69) / 12);
 
     osc.type = "sine";
     osc.frequency.value = freq;
@@ -226,6 +246,7 @@ function playWithDrone(intervals) {
 /* Elements */
 const rootSelect = document.getElementById("root");
 const chordSelect = document.getElementById("chord");
+const oneStringCheckbox = document.getElementById("oneString");
 const callDisplay = document.getElementById("callDisplay");
 const responseDisplay = document.getElementById("responseDisplay");
 
