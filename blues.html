@@ -2,19 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Blues Call & Response Generator</title>
+<title>Blues Call & Response</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-<!-- PWA Manifest (inline via data URL) -->
-<link rel="manifest" href='data:application/json,{
-  "name":"Blues Call & Response",
-  "short_name":"Blues C&R",
-  "start_url":".",
-  "display":"standalone",
-  "background_color":"#111111",
-  "theme_color":"#111111",
-  "icons":[]
-}'>
 
 <style>
   body {
@@ -27,9 +16,11 @@
   }
 
   h1 {
-    font-size: 1.2rem;
-    margin-bottom: 12px;
+    font-size: 1.1rem;
     text-align: center;
+    margin-bottom: 12px;
+    font-weight: 500;
+    letter-spacing: 1px;
   }
 
   select, button {
@@ -48,12 +39,14 @@
     padding: 10px;
     margin-top: 10px;
     border-radius: 6px;
+    background: #151515;
   }
 
   .label {
-    font-size: 0.8rem;
-    color: #aaa;
+    font-size: 0.7rem;
+    color: #888;
     margin-bottom: 4px;
+    letter-spacing: 1px;
   }
 
   .phrase {
@@ -65,7 +58,7 @@
 
 <body>
 
-<h1>Blues Call & Response</h1>
+<h1>CALL → RESPONSE</h1>
 
 <select id="root">
   <option value="60">C</option>
@@ -78,53 +71,32 @@
 </select>
 
 <select id="chord">
-  <option value="I">I (Tonic)</option>
-  <option value="IV">IV (Subdominant)</option>
-  <option value="V">V (Dominant)</option>
+  <option value="I">I</option>
+  <option value="IV">IV</option>
+  <option value="V">V</option>
 </select>
 
-<button id="generate" type="button">Generate Pattern</button>
+<button id="generate" type="button">Generate</button>
 <button id="playCall" type="button">Play Call</button>
 <button id="playResponse" type="button">Play Response</button>
-<button id="playBoth" type="button">Play Call + Response</button>
+<button id="playBoth" type="button">Play Both</button>
 
 <div class="box">
-  <div class="label">CALL (no resolution)</div>
+  <div class="label">CALL</div>
   <div class="phrase" id="callDisplay">—</div>
 </div>
 
 <div class="box">
-  <div class="label">RESPONSE (resolution)</div>
+  <div class="label">RESPONSE</div>
   <div class="phrase" id="responseDisplay">—</div>
 </div>
 
 <script>
-/* iOS gesture hardening */
+/* iOS audio unlock */
 document.addEventListener("touchstart", () => {}, { once: true });
 
-/* Service Worker (inline, offline cache) */
-if ("serviceWorker" in navigator) {
-  const swCode = `
-    const CACHE = "blues-call-response-v1";
-    self.addEventListener("install", e => {
-      e.waitUntil(
-        caches.open(CACHE).then(c =>
-          c.addAll(["./"])
-        )
-      );
-    });
-    self.addEventListener("fetch", e => {
-      e.respondWith(
-        caches.match(e.request).then(r => r || fetch(e.request))
-      );
-    });
-  `;
-  const blob = new Blob([swCode], { type: "text/javascript" });
-  const swURL = URL.createObjectURL(blob);
-  navigator.serviceWorker.register(swURL);
-}
-
 let audioCtx = null;
+let lastCall = null;
 
 /* Interval map */
 const intervalMap = {
@@ -138,73 +110,93 @@ const intervalMap = {
   "b7": 10
 };
 
-/* Call rules */
-const callPool = ["5", "b7", "b3", "2", "4"];
-const callEndNotes = ["b3", "2", "b5", "b7"];
+/* ===== REAL BLUES VOCAB ===== */
 
-/* Response rules by chord */
-const responsePool = ["b3", "4", "2", "5"];
+/* Call phrase shapes (idiomatic) */
+const CALL_PATTERNS = [
+  ["b3", "4", "b3"],    // weighted
+  ["b3", "4", "b3"],    // weighted
+  ["5", "b7", "5"],
+  ["b3", "2"],
+  ["4", "b3"],
+  ["5", "5", "b7"],
+  ["b7", "5"],
+  ["2", "b3", "4"]
+];
 
-const responseTargets = {
-  I: ["3", "b7", "1"],
-  IV: ["3", "1"],
-  V: ["3"]   // dominant pull — strong resolution
-};
+/* Response shapes by chord */
+const RESPONSE_I = [
+  ["b3", "3"], ["b3", "3"], // weighted
+  ["4", "3"],
+  ["b7", "3"],
+  ["3"],
+  ["b7"]
+];
 
-let callPhrase = [];
-let responsePhrase = [];
+const RESPONSE_IV = [
+  ["b3", "3"],
+  ["4", "3"],
+  ["3"],
+  ["1"]
+];
 
+const RESPONSE_V = [
+  ["4", "3"],
+  ["b7", "3"],
+  ["3"]
+];
+
+/* Utility */
 function randomItem(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
+/* Generator with repetition bias */
 function generatePhrase() {
-  callPhrase = [
-    randomItem(callPool),
-    randomItem(callPool),
-    randomItem(callEndNotes)
-  ];
+  const chord = chordSelect.value;
 
-  const chord = document.getElementById("chord").value;
-  const resolution = randomItem(responseTargets[chord]);
+  // 50% chance to reuse previous call
+  if (lastCall && Math.random() < 0.5) {
+    callPhrase = lastCall;
+  } else {
+    callPhrase = randomItem(CALL_PATTERNS);
+    lastCall = callPhrase;
+  }
 
-  responsePhrase = [
-    randomItem(responsePool),
-    resolution
-  ];
+  if (chord === "I") responsePhrase = randomItem(RESPONSE_I);
+  if (chord === "IV") responsePhrase = randomItem(RESPONSE_IV);
+  if (chord === "V") responsePhrase = randomItem(RESPONSE_V);
 
   callDisplay.textContent = callPhrase.join(" – ");
   responseDisplay.textContent = responsePhrase.join(" – ");
 }
 
+/* Audio */
 function ensureAudio() {
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }
-  if (audioCtx.state === "suspended") {
-    audioCtx.resume();
-  }
+  if (audioCtx.state === "suspended") audioCtx.resume();
 }
 
 function playIntervals(intervals) {
-  if (!intervals.length) return;
-
+  if (!intervals || !intervals.length) return;
   ensureAudio();
 
   const root = parseInt(rootSelect.value, 10);
   const chord = chordSelect.value;
 
   let base = root;
-  if (chord === "IV") base = root + 5;
-  if (chord === "V") base = root + 7;
+  if (chord === "IV") base += 5;
+  if (chord === "V") base += 7;
 
   let time = audioCtx.currentTime;
 
-  intervals.forEach(interval => {
+  intervals.forEach(i => {
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
 
-    const midi = base + intervalMap[interval];
+    const midi = base + intervalMap[i];
     const freq = 440 * Math.pow(2, (midi - 69) / 12);
 
     osc.type = "sine";
@@ -218,7 +210,7 @@ function playIntervals(intervals) {
     osc.start(time);
     osc.stop(time + 0.8);
 
-    time += 0.9; // doubled duration
+    time += 0.9;
   });
 }
 
