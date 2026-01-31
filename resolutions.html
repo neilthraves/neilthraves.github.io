@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Resolutions</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<style>
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #111;
+    color: #eee;
+    margin: 0;
+    padding: 16px;
+  }
+
+  h1 {
+    font-size: 0.95rem;
+    text-align: center;
+    margin-bottom: 10px;
+    font-weight: 500;
+    color: #bbb;
+    letter-spacing: 1px;
+  }
+
+  .strip-wrapper {
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+
+  .strip {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(120px, 1fr));
+    gap: 8px;
+    min-width: 720px;
+  }
+
+  .cell {
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 8px;
+    background: #151515;
+    display: grid;
+    grid-template-rows: auto 1fr;
+  }
+
+  .header {
+    text-align: center;
+    font-size: 0.85rem;
+    margin-bottom: 6px;
+    color: #ccc;
+    letter-spacing: 1px;
+  }
+
+  .columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .col {
+    border: 1px solid #333;
+    border-radius: 4px;
+    padding: 6px;
+    text-align: center;
+    font-size: 0.8rem;
+  }
+
+  .col-title {
+    font-size: 0.65rem;
+    color: #888;
+    margin-bottom: 4px;
+  }
+
+  .notes {
+    line-height: 1.45;
+    letter-spacing: 1px;
+  }
+
+  @media (orientation: portrait) {
+    .strip {
+      grid-template-columns: repeat(6, minmax(100px, 1fr));
+    }
+  }
+</style>
+</head>
+
+<body>
+
+<h1>RESOLUTIONS</h1>
+
+<div class="strip-wrapper">
+  <div class="strip">
+
+    <!-- I -->
+    <div class="cell">
+      <div class="header">I</div>
+      <div class="columns">
+        <div class="col">
+          <div class="col-title">UNR</div>
+          <div class="notes">b3<br>4<br>2<br>b7</div>
+        </div>
+        <div class="col">
+          <div class="col-title">RES</div>
+          <div class="notes">3<br>b7<br>1</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IV -->
+    <div class="cell">
+      <div class="header">IV</div>
+      <div class="columns">
+        <div class="col">
+          <div class="col-title">UNR</div>
+          <div class="notes">b3<br>4<br>2<br>b7</div>
+        </div>
+        <div class="col">
+          <div class="col-title">RES</div>
+          <div class="notes">3<br>1</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- I -->
+    <div class="cell">
+      <div class="header">I</div>
+      <div class="columns">
+        <div class="col">
+          <div class="col-title">UNR</div>
+          <div class="notes">b3<br>4<br>2<br>b7</div>
+        </div>
+        <div class="col">
+          <div class="col-title">RES</div>
+          <div class="notes">3<br>b7<br>1</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- V -->
+    <div class="cell">
+      <div class="header">V</div>
+      <div class="columns">
+        <div class="col">
+          <div class="col-title">UNR</div>
+          <div class="notes">b7<br>4<br>b3<br>2</div>
+        </div>
+        <div class="col">
+          <div class="col-title">RES</div>
+          <div class="notes">3</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IV -->
+    <div class="cell">
+      <div class="header">IV</div>
+      <div class="columns">
+        <div class="col">
+          <div class="col-title">UNR</div>
+          <div class="notes">b3<br>4<br>2<br>b7</div>
+        </div>
+        <div class="col">
+          <div class="col-title">RES</div>
+          <div class="notes">3<br>1</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- I -->
+    <div class="cell">
+      <div class="header">I</div>
+      <div class="columns">
+        <div class="col">
+          <div class="col-title">UNR</div>
+          <div class="notes">b3<br>4<br>2<br>b7</div>
+        </div>
+        <div class="col">
+          <div class="col-title">RES</div>
+          <div class="notes">1<br>3</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
