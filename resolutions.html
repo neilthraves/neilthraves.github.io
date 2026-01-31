@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Resolutions</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<style>
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #111;
+    color: #eee;
+    margin: 0;
+    padding: 12px;
+  }
+
+  h1 {
+    font-size: 0.9rem;
+    text-align: center;
+    margin-bottom: 10px;
+    font-weight: 500;
+    color: #bbb;
+    letter-spacing: 1px;
+  }
+
+  .strip {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
+    width: 100%;
+  }
+
+  .cell {
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 6px;
+    background: #151515;
+    display: grid;
+    grid-template-rows: auto 1fr;
+  }
+
+  .header {
+    text-align: center;
+    font-size: clamp(0.75rem, 2.5vw, 0.85rem);
+    margin-bottom: 4px;
+    color: #ccc;
+    letter-spacing: 1px;
+  }
+
+  .columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+  }
+
+  .col {
+    border: 1px solid #333;
+    border-radius: 4px;
+    padding: 4px 2px;
+    text-align: center;
+    font-size: clamp(0.7rem, 2.4vw, 0.8rem);
+  }
+
+  .notes {
+    line-height: 1.45;
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+
+<body>
+
+<h1>RESOLUTIONS</h1>
+
+<div class="strip">
+
+  <!-- I -->
+  <div class="cell">
+    <div class="header">I</div>
+    <div class="columns">
+      <div class="col"><div class="notes">b3<br>4<br>2<br>b7</div></div>
+      <div class="col"><div class="notes">3<br>b7<br>1</div></div>
+    </div>
+  </div>
+
+  <!-- IV -->
+  <div class="cell">
+    <div class="header">IV</div>
+    <div class="columns">
+      <div class="col"><div class="notes">b3<br>4<br>2<br>b7</div></div>
+      <div class="col"><div class="notes">3<br>1</div></div>
+    </div>
+  </div>
+
+  <!-- I -->
+  <div class="cell">
+    <div class="header">I</div>
+    <div class="columns">
+      <div class="col"><div class="notes">b3<br>4<br>2<br>b7</div></div>
+      <div class="col"><div class="notes">3<br>b7<br>1</div></div>
+    </div>
+  </div>
+
+  <!-- V -->
+  <div class="cell">
+    <div class="header">V</div>
+    <div class="columns">
+      <div class="col"><div class="notes">b7<br>4<br>b3<br>2</div></div>
+      <div class="col"><div class="notes">3</div></div>
+    </div>
+  </div>
+
+  <!-- IV -->
+  <div class="cell">
+    <div class="header">IV</div>
+    <div class="columns">
+      <div class="col"><div class="notes">b3<br>4<br>2<br>b7</div></div>
+      <div class="col"><div class="notes">3<br>1</div></div>
+    </div>
+  </div>
+
+  <!-- I -->
+  <div class="cell">
+    <div class="header">I</div>
+    <div class="columns">
+      <div class="col"><div class="notes">b3<br>4<br>2<br>b7</div></div>
+      <div class="col"><div class="notes">1<br>3</div></div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
