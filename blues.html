@@ -191,7 +191,7 @@ function playWithDrone(intervals) {
   const chord = chordSelect.value;
   const oneString = oneStringCheckbox.checked;
 
-  let base = root;
+  let base = root - 12;
   if (chord === "IV") base += 5;
   if (chord === "V") base += 7;
 
