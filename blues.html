@@ -92,7 +92,6 @@
 </div>
 
 <script>
-/* iOS audio unlock */
 document.addEventListener("touchstart", () => {}, { once: true });
 
 let audioCtx = null;
@@ -112,10 +111,9 @@ const intervalMap = {
 
 /* ===== REAL BLUES VOCAB ===== */
 
-/* Call phrase shapes (idiomatic) */
 const CALL_PATTERNS = [
-  ["b3", "4", "b3"],    // weighted
-  ["b3", "4", "b3"],    // weighted
+  ["b3", "4", "b3"],
+  ["b3", "4", "b3"],
   ["5", "b7", "5"],
   ["b3", "2"],
   ["4", "b3"],
@@ -124,9 +122,8 @@ const CALL_PATTERNS = [
   ["2", "b3", "4"]
 ];
 
-/* Response shapes by chord */
 const RESPONSE_I = [
-  ["b3", "3"], ["b3", "3"], // weighted
+  ["b3", "3"], ["b3", "3"],
   ["4", "3"],
   ["b7", "3"],
   ["3"],
@@ -146,16 +143,13 @@ const RESPONSE_V = [
   ["3"]
 ];
 
-/* Utility */
 function randomItem(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-/* Generator with repetition bias */
 function generatePhrase() {
   const chord = chordSelect.value;
 
-  // 50% chance to reuse previous call
   if (lastCall && Math.random() < 0.5) {
     callPhrase = lastCall;
   } else {
@@ -171,7 +165,8 @@ function generatePhrase() {
   responseDisplay.textContent = responsePhrase.join(" – ");
 }
 
-/* Audio */
+/* ===== AUDIO ===== */
+
 function ensureAudio() {
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -179,7 +174,7 @@ function ensureAudio() {
   if (audioCtx.state === "suspended") audioCtx.resume();
 }
 
-function playIntervals(intervals) {
+function playWithDrone(intervals) {
   if (!intervals || !intervals.length) return;
   ensureAudio();
 
@@ -190,7 +185,19 @@ function playIntervals(intervals) {
   if (chord === "IV") base += 5;
   if (chord === "V") base += 7;
 
-  let time = audioCtx.currentTime;
+  const now = audioCtx.currentTime;
+
+  /* Drone */
+  const droneOsc = audioCtx.createOscillator();
+  const droneGain = audioCtx.createGain();
+  droneOsc.type = "sine";
+  droneOsc.frequency.value = 440 * Math.pow(2, (base - 69) / 12);
+  droneGain.gain.value = 0.08;
+
+  droneOsc.connect(droneGain).connect(audioCtx.destination);
+  droneOsc.start(now);
+
+  let time = now;
 
   intervals.forEach(i => {
     const osc = audioCtx.createOscillator();
@@ -203,15 +210,17 @@ function playIntervals(intervals) {
     osc.frequency.value = freq;
 
     gain.gain.setValueAtTime(0.0001, time);
-    gain.gain.exponentialRampToValueAtTime(0.25, time + 0.04);
-    gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.7);
+    gain.gain.exponentialRampToValueAtTime(0.25, time + 0.05);
+    gain.gain.exponentialRampToValueAtTime(0.0001, time + 1.2);
 
     osc.connect(gain).connect(audioCtx.destination);
     osc.start(time);
-    osc.stop(time + 0.8);
+    osc.stop(time + 1.3);
 
-    time += 0.9;
+    time += 1.4;
   });
+
+  droneOsc.stop(time + 0.2);
 }
 
 /* Elements */
@@ -222,9 +231,9 @@ const responseDisplay = document.getElementById("responseDisplay");
 
 /* Buttons */
 generate.onclick = generatePhrase;
-playCall.onclick = () => playIntervals(callPhrase);
-playResponse.onclick = () => playIntervals(responsePhrase);
-playBoth.onclick = () => playIntervals([...callPhrase, ...responsePhrase]);
+playCall.onclick = () => playWithDrone(callPhrase);
+playResponse.onclick = () => playWithDrone(responsePhrase);
+playBoth.onclick = () => playWithDrone([...callPhrase, ...responsePhrase]);
 </script>
 
 </body>
